@@ -4,10 +4,11 @@
  *
  * @module DesktopManagedPolicy
  */
-import type { ManagedPolicyDocument } from "@t3tools/contracts";
+import { applyForkPrivacyLimits, type ManagedPolicyDocument } from "@t3tools/contracts";
 import {
   layerWindowsRegistry,
   ManagedPolicyFileError,
+  managedPolicyPath,
   readManagedPolicy,
   WindowsRegistry,
 } from "@t3tools/shared/managedPolicyFile";
@@ -37,6 +38,18 @@ export const layer = Layer.effect(
     const { platform } = yield* DesktopEnvironment.DesktopEnvironment;
     const read = yield* Effect.cached(
       readManagedPolicy(platform).pipe(
+        Effect.flatMap((found) => {
+          const source = found?.source ?? managedPolicyPath(platform);
+          const document = applyForkPrivacyLimits(found?.document);
+          return document === null
+            ? Effect.fail(
+                new ManagedPolicyFileError({
+                  path: source,
+                  reason: "This fork requires the policy to permit at least one local client.",
+                }),
+              )
+            : Effect.succeed({ source, document });
+        }),
         Effect.provideService(FileSystem.FileSystem, yield* FileSystem.FileSystem),
         Effect.provideService(
           ChildProcessSpawner.ChildProcessSpawner,

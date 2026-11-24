@@ -13,6 +13,7 @@ import * as HostProcess from "@t3tools/shared/HostProcess";
 
 import { BUILT_IN_DRIVERS } from "../provider/builtInDrivers.ts";
 import * as ManagedPolicy from "./ManagedPolicy.ts";
+import * as ManagedLimits from "./managedLimits.ts";
 import { disallowedDriverReason, providerHostEnvironment } from "./managedProviders.ts";
 import * as ManagedSettings from "./managedSettings.ts";
 
@@ -492,3 +493,48 @@ it.layer(NodeServices.layer)("ManagedPolicy.load", (it) => {
       }),
   );
 });
+
+it.effect("fork privacy overrides permissive policy without widening local access", () =>
+  Effect.gen(function* () {
+    const localOnly = yield* ManagedPolicy.withForkPrivacy("/test/policy.json", {
+      schemaVersion: 1,
+      organization: "Test",
+      settings: { "agentFeedback.mode": { value: "automatic", locked: true } },
+      limits: { clients: ["desktop", "remote"], telemetry: true, connect: true },
+    });
+
+    assert.deepEqual(localOnly.document?.limits?.clients, ["desktop"]);
+    assert.isFalse(localOnly.document?.limits?.telemetry);
+    assert.isFalse(localOnly.document?.limits?.connect);
+    assert.isFalse(localOnly.document?.limits?.webhookTasks);
+    assert.isFalse(localOnly.document?.limits?.previewTunnel);
+    assert.strictEqual(localOnly.document?.limits?.updates?.mode, "off");
+    assert.deepEqual(localOnly.document?.settings?.agentFeedback, {
+      value: { mode: "off" },
+      locked: true,
+    });
+  }),
+);
+
+it.effect("accepts local binds and rejects public binds in the default fork policy", () =>
+  Effect.gen(function* () {
+    const policy = yield* ManagedPolicy.withForkPrivacy("/test/policy.json", undefined);
+    assert.strictEqual(
+      yield* ManagedLimits.checkServerReachability(policy, {
+        authPolicy: "loopback-browser",
+        host: undefined,
+        tailscaleServeEnabled: false,
+      }),
+      "127.0.0.1",
+    );
+    const refusal = yield* Effect.flip(
+      ManagedLimits.checkServerReachability(policy, {
+        authPolicy: "remote-reachable",
+        host: "0.0.0.0",
+        tailscaleServeEnabled: false,
+      }),
+    );
+    assert.strictEqual(refusal._tag, "ManagedPolicyRefusedError");
+    assert.isFalse(ManagedLimits.allowsConnect(policy));
+  }),
+);

@@ -726,10 +726,27 @@ const layerServerRestart = Layer.effect(
   }),
 );
 
+const skipConnectWork = Effect.fn("server.skipConnectWork")(() => Effect.void);
+
+const layerConnectWorkers = Layer.unwrap(
+  Effect.map(ManagedPolicy.ManagedPolicy, (policy) =>
+    ManagedLimits.allowsConnect(policy)
+      ? Layer.merge(AgentAwarenessRelay.layer, HeldHooksWaker.layer)
+      : Layer.succeed(
+          AgentAwarenessRelay.AgentAwarenessRelay,
+          AgentAwarenessRelay.AgentAwarenessRelay.of({
+            publishThread: skipConnectWork,
+            drain: Effect.void,
+            requestCatchUp: skipConnectWork,
+            start: skipConnectWork,
+          }),
+        ),
+  ),
+).pipe(Layer.provide(ManagedPolicy.layer));
+
 const layerRuntimeCoreDependenciesBase = Layer.mergeAll(
-  AgentAwarenessRelay.layer,
+  layerConnectWorkers,
   ProviderHostPathWatcher.layer.pipe(Layer.provide(layerDesktopTelemetryReceiver)),
-  HeldHooksWaker.layer,
   layerThreadSettlementWorker,
   layerIdleCompactionWorker,
   StorageCleanup.layer.pipe(Layer.provide(ProjectionStoreV2.layer)),

@@ -6,6 +6,7 @@ import * as Option from "effect/Option";
 import * as Tracer from "effect/Tracer";
 
 import {
+  layer,
   nonInterferingTracer,
   RelayClientTracer,
   withLocalTracing,
@@ -118,3 +119,17 @@ describe("withLocalTracing", () => {
     }),
   );
 });
+
+it.effect("keeps relay tracing local even with an exporter configured", () =>
+  Effect.gen(function* () {
+    const tracer = yield* RelayClientTracer.pipe(
+      Effect.provide(
+        layer(
+          { tracesUrl: "https://telemetry.example", tracesDataset: "test", tracesToken: "fake" },
+          { serviceName: "test", runtime: "node", serviceInstanceId: "1", client: "desktop" },
+        ),
+      ),
+    );
+    expect(Option.isNone(tracer)).toBe(true);
+  }),
+);

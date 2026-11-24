@@ -1030,7 +1030,7 @@ it.layer(NodeServices.layer)("cli config resolution", (it) => {
       }),
   );
 
-  it.effect("listens on private networks per T3CODE_LAN, else under the service launcher", () =>
+  it.effect("does not enable LAN by default for services", () =>
     Effect.gen(function* () {
       const { join } = yield* Path.Path;
       const baseDir = join(NodeOS.tmpdir(), "t3-cli-config-service-host");
@@ -1060,10 +1060,10 @@ it.layer(NodeServices.layer)("cli config resolution", (it) => {
           }),
         );
 
-      // A service installed before T3CODE_LAN existed.
+      // Services installed before T3CODE_LAN existed stay on loopback.
       expect(yield* resolveHost({ connected: true })).toEqual({
-        host: "0.0.0.0",
-        privateNetworkOnly: true,
+        host: undefined,
+        privateNetworkOnly: undefined,
       });
       // `service.env` reaches the server as its environment.
       expect(yield* resolveHost({ connected: true, env: { T3CODE_HOST: "127.0.0.1" } })).toEqual({

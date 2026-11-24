@@ -6,7 +6,11 @@
  */
 import * as NodeModule from "node:module";
 
-import { ManagedPolicyDocument, type ManagedPolicySummary } from "@t3tools/contracts";
+import {
+  applyForkPrivacyLimits,
+  ManagedPolicyDocument,
+  type ManagedPolicySummary,
+} from "@t3tools/contracts";
 import * as Config from "effect/Config";
 import * as Context from "effect/Context";
 import * as Digest from "effect/crypto/Digest";
@@ -174,6 +178,20 @@ export const load = Effect.fn("ManagedPolicy.load")(function* (path: string) {
   return yield* fromDocument(path, yield* readManagedPolicyFile(path));
 });
 
+export const withForkPrivacy = Effect.fn("ManagedPolicy.withForkPrivacy")(function* (
+  path: string,
+  document: ManagedPolicyDocument | undefined,
+) {
+  const restricted = applyForkPrivacyLimits(document);
+  if (restricted === null) {
+    return yield* new ManagedPolicyFileError({
+      path,
+      reason: "This fork requires the policy to permit at least one local client.",
+    });
+  }
+  return yield* fromDocument(path, restricted);
+});
+
 const make = Effect.gen(function* () {
   // Source builds may read a policy from elsewhere so it can be tried without root. Release
   // builds never do: any override a user can set is a way around the policy.
@@ -185,14 +203,15 @@ const make = Effect.gen(function* () {
       : Option.none<string>();
   const platform = yield* HostProcess.Platform;
   const policy = yield* Option.match(devPath, {
-    onSome: load,
+    onSome: (path) =>
+      Effect.flatMap(readManagedPolicyFile(path), (document) => withForkPrivacy(path, document)),
     onNone: () =>
       readManagedPolicy(
         platform,
         ManagedProviders.knownDriverLabels().map(({ driver }) => driver),
       ).pipe(
         Effect.flatMap((found) =>
-          fromDocument(found?.source ?? managedPolicyPath(platform), found?.document),
+          withForkPrivacy(found?.source ?? managedPolicyPath(platform), found?.document),
         ),
       ),
   });

@@ -133,6 +133,39 @@ export const ManagedPolicyDocument = Schema.Struct({
 });
 export type ManagedPolicyDocument = typeof ManagedPolicyDocument.Type;
 
+/** Local access and privacy limits that an installed policy can narrow further. */
+export function applyForkPrivacyLimits(
+  document: ManagedPolicyDocument | undefined,
+): ManagedPolicyDocument | null {
+  const clients: ReadonlyArray<ManagedPolicyClient> = document?.limits?.clients ?? [
+    "desktop",
+    "local-browser",
+  ];
+  const [firstClient, ...otherClients] = clients.filter((client) => client !== "remote");
+  if (firstClient === undefined) return null;
+  const settings = { ...document?.settings };
+  delete settings["agentFeedback.mode"];
+
+  return {
+    ...document,
+    schemaVersion: 1,
+    organization: document?.organization ?? "T3 Code Local",
+    settings: {
+      ...settings,
+      agentFeedback: { value: { mode: "off" }, locked: true },
+    },
+    limits: {
+      ...document?.limits,
+      clients: [firstClient, ...otherClients],
+      connect: false,
+      telemetry: false,
+      webhookTasks: false,
+      previewTunnel: false,
+      updates: { mode: "off" },
+    },
+  };
+}
+
 /** What clients learn about the policy: enough to explain a locked control, no values. */
 export const ManagedPolicySummary = Schema.Struct({
   organization: TrimmedNonEmptyString,
