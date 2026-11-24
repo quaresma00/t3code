@@ -12798,5 +12798,15 @@
     ")"
   ],
   "33d18dda74f6d7b3": "Cancelar merge automático da pilha",
-  "012c67c7f1a99e33": "Merge automático da pilha"
+  "012c67c7f1a99e33": "Merge automático da pilha",
+  "d25661576338fcf0": "Requer atenção",
+  "03efd657bb7fab94": "Nenhuma conversa requer sua atenção.",
+  "93e69e7c65c52f5d": "Em execução",
+  "ad4b28b127d6c8f0": "Nenhuma conversa em execução.",
+  "98d1a0a5ce0e45ad": "Não lidos",
+  "e12ae6fcd6dc0e20": "Nenhum resultado não lido.",
+  "0bc7c07a051dce3c": "Plano pronto",
+  "0d7ae78dfa6c0b67": "Atividade das conversas",
+  "ec5fcdd0a9f08b85": "{count, plural, one {{count} conversa requer sua atenção} other {{count} conversas requerem sua atenção}}",
+  "0ecd2890dc3d6d13": "Filtros de atividade das conversas"
 }

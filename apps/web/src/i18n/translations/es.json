@@ -12793,5 +12793,15 @@
     ")"
   ],
   "33d18dda74f6d7b3": "Cancelar la fusión automática de la pila",
-  "012c67c7f1a99e33": "Fusión automática de la pila"
+  "012c67c7f1a99e33": "Fusión automática de la pila",
+  "d25661576338fcf0": "Por atender",
+  "03efd657bb7fab94": "Ningún hilo requiere tu atención.",
+  "93e69e7c65c52f5d": "En curso",
+  "ad4b28b127d6c8f0": "No hay hilos en curso.",
+  "98d1a0a5ce0e45ad": "Sin leer",
+  "e12ae6fcd6dc0e20": "No hay resultados sin leer.",
+  "0bc7c07a051dce3c": "Plan listo",
+  "0d7ae78dfa6c0b67": "Actividad de hilos",
+  "ec5fcdd0a9f08b85": "{count, plural, one {{count} hilo requiere tu atención} other {{count} hilos requieren tu atención}}",
+  "0ecd2890dc3d6d13": "Filtros de actividad de hilos"
 }

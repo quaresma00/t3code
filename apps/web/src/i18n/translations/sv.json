@@ -12805,5 +12805,15 @@
     ")"
   ],
   "33d18dda74f6d7b3": "Avbryt automatisk merge för stacken",
-  "012c67c7f1a99e33": "Merga stacken automatiskt"
+  "012c67c7f1a99e33": "Merga stacken automatiskt",
+  "d25661576338fcf0": "Kräver åtgärd",
+  "03efd657bb7fab94": "Inga trådar kräver din uppmärksamhet.",
+  "93e69e7c65c52f5d": "Pågår",
+  "ad4b28b127d6c8f0": "Inga trådar pågår.",
+  "98d1a0a5ce0e45ad": "Olästa",
+  "e12ae6fcd6dc0e20": "Inga olästa resultat.",
+  "0bc7c07a051dce3c": "Plan klar",
+  "0d7ae78dfa6c0b67": "Trådaktivitet",
+  "ec5fcdd0a9f08b85": "{count, plural, one {{count} tråd kräver din uppmärksamhet} other {{count} trådar kräver din uppmärksamhet}}",
+  "0ecd2890dc3d6d13": "Filter för trådaktivitet"
 }

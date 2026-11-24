@@ -258,6 +258,7 @@ import {
 } from "./ui/combobox";
 import { SidebarContent, SidebarGroup, useSidebar } from "./ui/sidebar";
 import { SidebarChromeFooter, SidebarChromeHeader } from "./sidebar/SidebarChrome";
+import { SidebarThreadActivity } from "./sidebar/SidebarThreadActivity";
 import { SidebarHeaderIconButton, SidebarThreadHeader } from "./sidebar/SidebarThreadHeader";
 import { TooltipProvider } from "./ui/tooltip";
 import {
@@ -3323,6 +3324,19 @@ export default function Sidebar({ routeReveal }: { routeReveal: SidebarRouteReve
               activeSearchResultIndex={activeSearchResultIndex}
               onClearSearch={clearThreadSearch}
             />
+            {projectGroups.length > 0 && (
+              <SidebarThreadActivity
+                threads={listedThreads}
+                delegatedUnderParent={delegatedUnderParent}
+                now={snoozeNow}
+                projectNames={projectDisplayNameByKey}
+                isMobile={isMobile}
+                onOpenThread={(ref) => {
+                  clearThreadSearch();
+                  void navigateToThread(ref);
+                }}
+              />
+            )}
           </SidebarGroup>
         }
       >

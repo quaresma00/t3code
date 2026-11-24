@@ -12807,5 +12807,15 @@
     ")"
   ],
   "33d18dda74f6d7b3": "Cancel stack auto-merge",
-  "012c67c7f1a99e33": "Auto-merge stack"
+  "012c67c7f1a99e33": "Auto-merge stack",
+  "d25661576338fcf0": "Needs you",
+  "03efd657bb7fab94": "No threads need your attention.",
+  "93e69e7c65c52f5d": "Running",
+  "ad4b28b127d6c8f0": "No threads are running.",
+  "98d1a0a5ce0e45ad": "Unread",
+  "e12ae6fcd6dc0e20": "No unread results.",
+  "0bc7c07a051dce3c": "Plan ready",
+  "0d7ae78dfa6c0b67": "Thread activity",
+  "ec5fcdd0a9f08b85": "{count, plural, one {{count} thread needs attention} other {{count} threads need attention}}",
+  "0ecd2890dc3d6d13": "Thread activity filters"
 }

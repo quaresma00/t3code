@@ -12798,5 +12798,15 @@
     ")"
   ],
   "33d18dda74f6d7b3": "Annuler la fusion automatique de la pile",
-  "012c67c7f1a99e33": "Fusion automatique de la pile"
+  "012c67c7f1a99e33": "Fusion automatique de la pile",
+  "d25661576338fcf0": "À traiter",
+  "03efd657bb7fab94": "Aucun fil ne nécessite votre attention.",
+  "93e69e7c65c52f5d": "En cours",
+  "ad4b28b127d6c8f0": "Aucun fil en cours.",
+  "98d1a0a5ce0e45ad": "Non lus",
+  "e12ae6fcd6dc0e20": "Aucun résultat non lu.",
+  "0bc7c07a051dce3c": "Plan prêt",
+  "0d7ae78dfa6c0b67": "Activité des fils",
+  "ec5fcdd0a9f08b85": "{count, plural, one {{count} fil nécessite votre attention} other {{count} fils nécessitent votre attention}}",
+  "0ecd2890dc3d6d13": "Filtres d’activité des fils"
 }

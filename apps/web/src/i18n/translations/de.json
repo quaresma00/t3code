@@ -12798,5 +12798,15 @@
     ")"
   ],
   "33d18dda74f6d7b3": "Auto-Merge für Stack abbrechen",
-  "012c67c7f1a99e33": "Auto-Merge für Stack"
+  "012c67c7f1a99e33": "Auto-Merge für Stack",
+  "d25661576338fcf0": "Handlungsbedarf",
+  "03efd657bb7fab94": "Kein Thread erfordert Aufmerksamkeit.",
+  "93e69e7c65c52f5d": "Läuft",
+  "ad4b28b127d6c8f0": "Keine Threads laufen.",
+  "98d1a0a5ce0e45ad": "Ungelesen",
+  "e12ae6fcd6dc0e20": "Keine ungelesenen Ergebnisse.",
+  "0bc7c07a051dce3c": "Plan bereit",
+  "0d7ae78dfa6c0b67": "Thread-Aktivität",
+  "ec5fcdd0a9f08b85": "{count, plural, one {{count} Thread braucht deine Aufmerksamkeit} other {{count} Threads brauchen deine Aufmerksamkeit}}",
+  "0ecd2890dc3d6d13": "Filter für Thread-Aktivität"
 }

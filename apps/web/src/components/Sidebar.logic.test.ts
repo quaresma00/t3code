@@ -1,4 +1,5 @@
 import { presentThreadShell } from "@t3tools/client-runtime/state/models";
+import { collectThreadActivity } from "./sidebar/threadActivity";
 import { threadKey } from "@t3tools/client-runtime/state/entities";
 import { isThreadWorking as isSidebarThreadWorking } from "@t3tools/client-runtime/state/thread-inbox";
 import * as DateTime from "effect/DateTime";
@@ -1854,5 +1855,77 @@ describe("filterSidebarProjectScopeItems", () => {
 
     expect(filter("")).toEqual([ADD_PROJECT_SCOPE_ITEM_VALUE, "all", "p1"]);
     expect(filter("project")).toEqual(["p1"]);
+  });
+});
+
+describe("collectThreadActivity", () => {
+  const now = "2026-03-09T10:15:00.000Z";
+  const visitedBeforeRun = "2026-03-09T10:04:00.000Z";
+  const runtime = {
+    activeRunId: null,
+    providerInstanceId: ProviderInstanceId.make("codex"),
+    providerName: "Codex",
+    lastError: null,
+    updatedAt: now,
+  };
+  const fixture = (id: string, overrides: ThreadFixtureOverrides = {}) =>
+    makeThreadFixture({ id: ThreadId.make(id), runtime: null, ...overrides });
+
+  it("puts pending decisions before failures and accounts for a subagent through its parent", () => {
+    const parent = fixture("parent", { pendingSubagentRequest: "approval" });
+    const child = fixture("child", {
+      hasPendingApprovals: true,
+      lineage: {
+        rootThreadId: parent.id,
+        parentThreadId: parent.id,
+        relationshipToParent: "subagent",
+      },
+    });
+    const recentFailure = fixture("failed", {
+      updatedAt: now,
+      runtime: { ...runtime, status: "failed" },
+    });
+    const answering = fixture("input", { hasPendingUserInput: true, updatedAt: visitedBeforeRun });
+    const plan = fixture("plan", { interactionMode: "plan", hasActionableProposedPlan: true });
+    const running = fixture("running", { runtime: { ...runtime, status: "running" } });
+    const groups = collectThreadActivity({
+      threads: [recentFailure, parent, child, answering, plan, running],
+      now,
+      localVisits: {},
+      delegatedUnderParent: new Set(),
+    });
+
+    expect(groups.attention.map(({ thread, reason }) => [thread.id, reason])).toEqual([
+      [answering.id, "input"],
+      [parent.id, "approval"],
+      [plan.id, "plan"],
+      [recentFailure.id, "failed"],
+    ]);
+    expect(groups.running.map(({ thread }) => thread.id)).toEqual([running.id]);
+  });
+
+  it("clears unread on visit and omits snoozed, settled and archived threads", () => {
+    const done = fixture("done", { latestRun: makeLatestRun(), lastVisitedAt: visitedBeforeRun });
+    const alreadyRead = fixture("read", { latestRun: makeLatestRun(), lastVisitedAt: now });
+    const legacy = fixture("legacy", { latestRun: makeLatestRun() });
+    const archived = fixture("archived", { archivedAt: now, hasPendingApprovals: true });
+    const settled = fixture("settled", { settledOverride: "settled", hasPendingApprovals: true });
+    const snoozed = fixture("snoozed", {
+      runtime: { ...runtime, status: "running" },
+      snoozedAt: now,
+      snoozedUntil: "2026-03-10T10:15:00.000Z",
+    });
+    const groups = collectThreadActivity({
+      threads: [done, alreadyRead, legacy, archived, settled, snoozed],
+      now,
+      localVisits: {
+        [scopedThreadKey(scopeThreadRef(legacy.environmentId, legacy.id))]: visitedBeforeRun,
+      },
+      delegatedUnderParent: new Set(),
+    });
+
+    expect(groups.attention).toEqual([]);
+    expect(groups.running).toEqual([]);
+    expect(groups.unread.map(({ thread }) => thread.id)).toEqual([done.id, legacy.id]);
   });
 });
